@@ -1,0 +1,28 @@
+{
+  "name": "state",
+  "version": "1.0.0",
+  "description": "State API is a javascript interface for storing values and managing callbacks for changes to those value",
+  "main": "state.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bemky/state.git"
+  },
+  "keywords": [
+    "callback",
+    "changes",
+    "listeners",
+    "state"
+  ],
+  "author": "Ben Ehmke <benehmke@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bemky/state/issues"
+  },
+  "homepage": "https://github.com/bemky/state#readme"
+}
