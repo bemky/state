@@ -21,7 +21,7 @@ export default class State {
     
     /**
         The root value of the state
-        @property value - can be any type or object
+        @property {*} value - can be any type or object
     */
     get value () {
         return this.#value
@@ -33,8 +33,8 @@ export default class State {
     /**
         Set the root value of the State
         @instance
-        @param newValue - the new value of the state; can be any type or object
-        @param metadata - any type or object to include as argument when calling listening callbacks
+        @param {*} newValue - the new value of the state; can be any type or object
+        @param {*} metadata - any type or object to include as argument when calling listening callbacks
         @returns {this}
     */
     set (newValue, metadata) {
@@ -49,9 +49,9 @@ export default class State {
         Call all listening callbacks
         @instance
         @private
-        @param newValue - the new value of the state; can be any type or object
-        @param oldValue - the old value of the state; can be any type or object
-        @param metadata - any type or object to include as argument when calling listening callbacks
+        @param {*} newValue - the new value of the state; can be any type or object
+        @param {*} oldValue - the old value of the state; can be any type or object
+        @param {*} metadata - any type or object to include as argument when calling listening callbacks
         @returns {this}
     */
     dispatch (newValue, oldValue, metadata) {
@@ -64,9 +64,9 @@ export default class State {
     
     /**
         @callback changeCallback
-        @param newValue - the new value of the state; can be any type or object
-        @param oldValue - the old value of the state; can be any type or object
-        @param metadata - any type or object that was included as argument when setting new value
+        @param {*} newValue - the new value of the state; can be any type or object
+        @param {*} oldValue - the old value of the state; can be any type or object
+        @param {*} metadata - any type or object that was included as argument when setting new value
     */
     
     /**
@@ -93,10 +93,10 @@ export default class State {
     
     /**
         @callback transformation
-        @param newValue - the new value of the state; can be any type or object
-        @param oldValue - the old value of the state; can be any type or object
-        @param metadata - any type or object that was included as argument when setting new value
-        @returns value to be set as spawns value
+        @param {*} newValue - the new value of the state; can be any type or object
+        @param {*} oldValue - the old value of the state; can be any type or object
+        @param {*} metadata - any type or object that was included as argument when setting new value
+        @returns {*} value to be set as spawns value
     */
     /**
         Spawns a new State who's value is tied to this state with the given tranformation
