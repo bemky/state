@@ -86,6 +86,6 @@ const el = createElement({
 })
 
 bg.set('black')
-el.style.background # >> black
+el.style.background // >> black
 
 ```
