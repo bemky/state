@@ -1,13 +1,14 @@
 {
   "name": "state",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "type": "module",
   "description": "State API is a javascript interface for storing values and managing callbacks for changes to those value",
   "main": "state.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --import ./test/loader.js --test **/*Test.js"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,10 @@
   "bugs": {
     "url": "https://github.com/bemky/state/issues"
   },
-  "homepage": "https://github.com/bemky/state#readme"
+  "homepage": "https://github.com/bemky/state#readme",
+  "devDependencies": {
+    "dolla": "^1.4.0",
+    "jsdom": "^26.1.0",
+    "jsdom-global": "^3.0.2"
+  }
 }

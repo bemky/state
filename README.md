@@ -69,3 +69,23 @@ isSet.addListener(v => { console.log(isSet.value)})
 projectName.set('New WIP')
 // log: true
 ```
+
+## Plugins
+### [Dolla](https://dollajs.com/)
+State works great with [Dolla](https://dollajs.com/). This plugin modifies the `setAttribute` method to setup listeners when passing State values.
+
+```javascript
+import { createElement } from 'dolla';
+import 'state/plugins/dolla'
+
+const bg = new State('white')
+const el = createElement({
+    style: {
+        background: bg
+    }
+})
+
+bg.set('black')
+el.style.background # >> black
+
+```
