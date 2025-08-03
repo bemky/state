@@ -1,10 +1,13 @@
-import test, { suite } from 'node:test';
+import test, { suite, after } from 'node:test';
 import assert from 'node:assert';
 import State from '../state.js';
 import { setAttribute } from 'dolla';
 import '../plugins/dolla.js';
 
 suite('dolla', () => {
+    after(() => {
+        State.disconnect();
+    });
     test('setAttribute.setValue', function () {
         const toggle = new State(true)
         const el = document.createElement('input')
@@ -72,7 +75,7 @@ suite('dolla', () => {
         setAttribute(el, 'style', style)
         assert.equal("<div style=\"background: blue; display: block;\"></div>", el.outerHTML)
         style.set({background: 'blue', display: 'none', padding: '1em'})
-        assert.equal("<div style=\"display: none; background: blue; padding: 1em;\"></div>", el.outerHTML)
+        assert.equal("<div style=\"background: blue; display: none; padding: 1em;\"></div>", el.outerHTML)
     });
     
     test('setAttribute.setStyle with object containing State', function () {
@@ -81,6 +84,6 @@ suite('dolla', () => {
         setAttribute(el, 'style', {background: bg, display: 'block'})
         assert.equal("<div style=\"background: blue; display: block;\"></div>", el.outerHTML)
         bg.set('red')
-        assert.equal("<div style=\"display: block; background: red;\"></div>", el.outerHTML)
+        assert.equal("<div style=\"background: red; display: block;\"></div>", el.outerHTML)
     });
 })

@@ -1,14 +1,14 @@
-import jsdomGlobal from 'jsdom-global';
+import { Window } from 'happy-dom';
 
-jsdomGlobal();
+const window = new Window();
 
-// Mock IntersectionObserver since JSDOM doesn't provide it
-globalThis.IntersectionObserver = class IntersectionObserver {
-    constructor(callback, options) {
-        this.callback = callback;
-        this.options = options;
+// Copy all window properties to global
+Object.getOwnPropertyNames(window).forEach(key => {
+    if (!(key in global)) {
+        global[key] = window[key];
     }
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
+});
+
+// Ensure common globals are set
+global.window = window;
+global.document = window.document;

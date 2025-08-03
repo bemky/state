@@ -11,7 +11,6 @@ export default class State {
     */
     isState = true
     
-    
     constructor(v) {
         this.#value = v
     }
@@ -88,6 +87,11 @@ export default class State {
     */
     removeListener (changeCallback) {
         this.listens = this.listens.filter(x => x !== changeCallback)
+        return this
+    }
+    
+    removeAllListeners () {
+        this.listens = []
         return this
     }
     

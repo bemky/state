@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <script type="importmap">
+    {
+      "imports": {
+        "dolla": "/node_modules/dolla/lib/dolla.js",
+        "dolla/": "/node_modules/dolla/lib/",
+        "state": "/state.js"
+      }
+    }
+  </script>
+  
+  <script type="module" src="../plugins/dolla.js"></script>
+  <title></title>
+      
+  <script type="module">
+      import State from 'state';
+      import { setAttribute, createElement } from 'dolla';
+      
+      const state = new State('pending')
+      const content = new State('Hello World')
+      document.addEventListener('DOMContentLoaded', () => {
+          document.body.append(createElement({
+              style: {
+                  color: state.transform(v => {
+                      if (v == "success") { 
+                          return "green"
+                      } else if (v == "fail") {
+                          return "red"
+                      } else {
+                          return "orange"
+                      }
+                  })
+              },
+              content: state.transform(v => {
+                  if (v == "success") { 
+                      return "&#10003; Success"
+                  } else if (v == "fail") {
+                      return "&#10005; Fail"
+                  } else {
+                      return v
+                  }
+              })
+          }))
+          
+          const el = document.createElement('span')
+          document.body.append(el)
+          setAttribute(el, 'content', content)
+      
+          const ref = new WeakRef(el)
+          el.remove()
+          setTimeout(() => {
+              State.cleanupReferences()
+              if (window.gc) {
+                  window.gc()
+                  state.set(ref.deref() ? "fail" : "success")
+              } else {
+                  state.set("<code>window.gc</code> is unavailable. Launch browser with gc <code>chrome --js-flags=\"--expose-gc\"</code>")
+              }
+          }, 100)
+      });
+  </script>
+  
+</head>
+<body></body>
+</html>
