@@ -23,7 +23,7 @@ function addListenerAndObserve (state, el, callback) {
 
 const setWas = setAttribute.set
 setAttribute.set = function (el, key, value, ...args) {
-    if (value?.isState) {
+    if (State.isState(value)) {
         addListenerAndObserve(value, el, v => setWas.call(this, el, key, v, ...args))
         setWas.call(this, el, key, value.value, ...args)
     } else {
@@ -32,36 +32,36 @@ setAttribute.set = function (el, key, value, ...args) {
 }
 
 // Deeply setup style properties to listen
-const styleSetPropertyWas = setAttribute.setStyle.setProperty
-setAttribute.setStyle.setProperty = function (el, key, value, ...args) {
-    if (value?.isState) {
-        addListenerAndObserve(value, el, v => styleSetPropertyWas.call(this, el, key, v, ...args))
-        styleSetPropertyWas.call(this, el, key, value.value, ...args)
+const styleSetWas = setAttribute.setStyle
+setAttribute.setStyle = function (el, key, value, ...args) {
+    if (State.isState(value)) {
+        addListenerAndObserve(value, el, v => styleSetWas.call(this, el, key, v, ...args))
+        styleSetWas.call(this, el, key, value.value, ...args)
     } else {
-        styleSetPropertyWas.call(this, el, key, value, ...args)
+        styleSetWas.call(this, el, key, value, ...args)
     }
 }
 
 // Deeply setup classes to toggle properties to listen
-const setClassForEachWas = setAttribute.setClass.forEach
-setAttribute.setClass.forEach = function (el, token) {
-    if (token?.isState) {
+const addClassWas = setAttribute.addClass
+setAttribute.addClass = function (el, token) {
+    if (State.isState(token)) {
         addListenerAndObserve(token, el, (now, was) => {
             el.classList.replace(was, now)
         })
-        setClassForEachWas.call(this, el, token.value)
+        addClassWas.call(this, el, token.value)
     } else {
-        setClassForEachWas.call(this, el, token)
+        addClassWas.call(this, el, token)
     }
 }
 
 // Deeply setup data properties to listen
-const setDataForEachWas = setAttribute.setData.forEach
-setAttribute.setData.forEach = function (el, key, value, ...args) {
-    if (value?.isState) {
-        addListenerAndObserve(value, el, v => setDataForEachWas.call(this, el, key, v, ...args))
-        setDataForEachWas.call(this, el, key, value.value, ...args)
+const setDataWas = setAttribute.setData
+setAttribute.setData = function (el, key, value, ...args) {
+    if (State.isState(value)) {
+        addListenerAndObserve(value, el, v => setDataWas.call(this, el, key, v, ...args))
+        setDataWas.call(this, el, key, value.value, ...args)
     } else {
-        setDataForEachWas.call(this, el, key, value, ...args)
+        setDataWas.call(this, el, key, value, ...args)
     }
 }

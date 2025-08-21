@@ -1,6 +1,6 @@
 {
   "name": "state",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "description": "State API is a javascript interface for storing values and managing callbacks for changes to those value",
   "main": "state.js",
@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/bemky/state#readme",
   "devDependencies": {
-    "dolla": "^1.4.0",
+    "dolla": "^1.5.2",
     "happy-dom": "^18.0.1"
   }
 }
