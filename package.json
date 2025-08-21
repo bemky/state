@@ -1,6 +1,6 @@
 {
   "name": "state",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "description": "State API is a javascript interface for storing values and managing callbacks for changes to those value",
   "main": "state.js",

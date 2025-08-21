@@ -11,6 +11,10 @@ export default class State {
     */
     isState = true
     
+    static isState (obj) {
+        return obj instanceof this
+    }
+    
     constructor(v) {
         this.#value = v
     }

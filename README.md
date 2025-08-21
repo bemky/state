@@ -89,3 +89,8 @@ bg.set('black')
 el.style.background // >> black
 
 ```
+
+### TODO
+- [ ] Viking
+- [ ] EJX
+- [ ] Komps

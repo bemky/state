@@ -45,3 +45,10 @@ test('transform', function() {
     isOpen.set(false)
     assert.equal(isOpenClass, '-hide')
 })
+
+test('static isState', function() {
+    const isOpen = new State(true)
+    const foo = 1
+    assert.ok(State.isState(isOpen))
+    assert.ok(!State.isState(foo))
+})
