@@ -47,7 +47,14 @@ const addClassWas = setAttribute.addClass
 setAttribute.addClass = function (el, token) {
     if (State.isState(token)) {
         addListenerAndObserve(token, el, (now, was) => {
-            el.classList.replace(was, now)
+            now = now.split(" ")
+            was = was.split(" ")
+            if (now.length == 1 && was.length == 1) {
+                el.classList.replace(was[0], now[0])
+            } else {
+                el.classList.remove(...was)
+                el.classList.add(...now)
+            }
         })
         addClassWas.call(this, el, token.value)
     } else {
