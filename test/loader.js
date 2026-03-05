@@ -1,4 +1,5 @@
 import { Window } from 'happy-dom';
+import { register } from 'node:module';
 
 const window = new Window();
 
@@ -12,3 +13,6 @@ Object.getOwnPropertyNames(window).forEach(key => {
 // Ensure common globals are set
 global.window = window;
 global.document = window.document;
+
+// Register resolve hook to handle extensionless imports (e.g. viking)
+register('./resolve-hooks.js', import.meta.url);

@@ -90,7 +90,34 @@ el.style.background // >> black
 
 ```
 
+### [Viking](https://github.com/malomalo/viking)
+This plugin adds a `state(attribute)` method to `Viking.Record.prototype`. It returns a State that stays in sync with the record's attribute or association.
+
+```javascript
+import { Record } from 'viking';
+import 'state/plugins/viking'
+
+class Ship extends Record {
+    static schema = {
+        name: { type: 'string' }
+    };
+}
+
+const ship = new Ship({ name: 'Black Pearl' })
+const nameState = ship.state('name')
+nameState.value // >> 'Black Pearl'
+
+ship.name = 'Flying Dutchman'
+nameState.value // >> 'Flying Dutchman'
+```
+
+For associations, the State tracks the association's `target`:
+
+```javascript
+const shipState = captain.state('ship')
+shipState.value // >> Ship { name: 'Black Pearl' }
+```
+
 ### TODO
-- [ ] Viking
 - [ ] EJX
 - [ ] Komps
