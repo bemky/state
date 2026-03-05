@@ -1,10 +1,10 @@
 import State from '../state.js';
-import { setAttribute } from 'dolla';
+import { setAttribute, insertBefore, remove, toNodes } from 'dolla';
 
 State.listeningReferences = new Set
 State.cleanupReferences = function () {
     State.listeningReferences.forEach(entry => {
-        if (!entry.el.parentElement) {
+        if (entry.els.every(el => !el.isConnected)) {
             entry.state.removeListener(entry.callback)
             State.listeningReferences.delete(entry)
         }
@@ -18,7 +18,33 @@ State.disconnect = function () {
 
 function addListenerAndObserve (state, el, callback) {
     state.addListener(callback)
-    State.listeningReferences.add({el, callback, state})
+    const entry = {
+        els: Array.isArray(el) ? el : [el],
+        callback,
+        state
+    }
+    State.listeningReferences.add(entry)
+    return entry
+}
+
+const fromObjectWas = toNodes.fromObject
+toNodes.fromObject = function (obj, ...args) {
+    if (State.isState(obj)) {
+        const entry = addListenerAndObserve(obj, toNodes(obj.value), function (v) {
+            const anchor = entry.els.find(x => x.parentNode)
+            const newContent = toNodes(v)
+            if (anchor) {
+                anchor.replaceWith(...newContent)
+                remove(entry.els);
+            } else {
+                entry.els.splice(0, entry.els.length, ...newContent)
+            }
+            entry.els = newContent
+        })
+        return entry.els
+    } else {
+        return fromObjectWas.call(this, obj, ...args)
+    }
 }
 
 const setWas = setAttribute.set

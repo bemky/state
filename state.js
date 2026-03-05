@@ -3,7 +3,7 @@
 */
 export default class State {
     #value = null;
-    listens = []
+    listens = new Set
     
     /**
         Denotes this object is a State, helpful for telling objects apart
@@ -79,7 +79,7 @@ export default class State {
         @returns {this}
     */
     addListener (changeCallback) {
-        this.listens.push(changeCallback)
+        this.listens.add(changeCallback)
         return this
     }
     
@@ -90,12 +90,12 @@ export default class State {
         @returns {this}
     */
     removeListener (changeCallback) {
-        this.listens = this.listens.filter(x => x !== changeCallback)
+        this.listens.delete(changeCallback)
         return this
     }
     
     removeAllListeners () {
-        this.listens = []
+        this.listens.clear()
         return this
     }
     

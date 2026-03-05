@@ -28,6 +28,20 @@ suite('dolla', () => {
         content.set('<span>World</span>')
         assert.equal('<span>World</span>', el.querySelector('span').outerHTML)
     });
+    
+    test('setAttribute.setContent in array', function () {
+        const content = new State('world')
+        const el = document.createElement('div')
+        setAttribute(el, 'content', [
+            {tag: 'strong', content: 'hello'},
+            content
+        ])
+        assert.equal('<div><strong>hello</strong>world</div>', el.outerHTML)
+        content.set('world!')
+        assert.equal('<div><strong>hello</strong>world!</div>', el.outerHTML)
+        content.set('<span>world</span>')
+        assert.equal('<div><strong>hello</strong><span>world</span></div>', el.outerHTML)
+    });
 
 
     test('setAttribute.setClass', function () {
@@ -94,5 +108,75 @@ suite('dolla', () => {
         assert.equal("<div style=\"background: blue; display: block;\"></div>", el.outerHTML)
         bg.set('red')
         assert.equal("<div style=\"background: red; display: block;\"></div>", el.outerHTML)
+    });
+
+    test('cleanup removes listener for setValue', function () {
+        const toggle = new State(true)
+        const el = document.createElement('input')
+        document.body.append(el)
+        setAttribute(el, 'type', 'checkbox')
+        setAttribute(el, 'checked', toggle)
+        assert.equal(toggle.listens.size, 1)
+        el.remove()
+        State.cleanupReferences()
+        assert.equal(toggle.listens.size, 0)
+    });
+
+    test('cleanup removes listener for setStyle', function () {
+        const bg = new State('blue')
+        const el = document.createElement('div')
+        document.body.append(el)
+        setAttribute(el, 'style', {background: bg})
+        assert.equal(bg.listens.size, 1)
+        el.remove()
+        State.cleanupReferences()
+        assert.equal(bg.listens.size, 0)
+    });
+
+    test('cleanup removes listener for setClass', function () {
+        const klass = new State('bg-white')
+        const el = document.createElement('div')
+        document.body.append(el)
+        setAttribute(el, 'class', klass)
+        assert.equal(klass.listens.size, 1)
+        el.remove()
+        State.cleanupReferences()
+        assert.equal(klass.listens.size, 0)
+    });
+
+    test('cleanup removes listener for setData', function () {
+        const name = new State('Rod')
+        const el = document.createElement('div')
+        document.body.append(el)
+        setAttribute(el, 'data', {name: name})
+        assert.equal(name.listens.size, 1)
+        el.remove()
+        State.cleanupReferences()
+        assert.equal(name.listens.size, 0)
+    });
+
+    test('cleanup removes listener for setContent', function () {
+        const content = new State('Hello')
+        const el = document.createElement('div')
+        document.body.append(el)
+        setAttribute(el, 'content', content)
+        assert.equal(content.listens.size, 1)
+        el.remove()
+        State.cleanupReferences()
+        assert.equal(content.listens.size, 0)
+    });
+
+    test('cleanup removes listener for setContent in array', function () {
+        const content = new State('world')
+        const el = document.createElement('div')
+        document.body.append(el)
+        setAttribute(el, 'content', [
+            {tag: 'strong', content: 'hello'},
+            content
+        ])
+        assert.equal(content.listens.size, 1)
+        el.remove()
+        State.cleanupReferences()
+        assert.equal(content.listens.size, 0)
     });
 })
