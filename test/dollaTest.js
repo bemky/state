@@ -29,6 +29,56 @@ suite('dolla', () => {
         assert.equal('<span>World</span>', el.querySelector('span').outerHTML)
     });
     
+    test('setAttribute.setContent with State nested deep in content', function () {
+        const activeChat = new State('Hello World')
+        const el = document.createElement('div')
+        setAttribute(el, 'class', 'flex-1 flex flex-col min-w-0')
+        setAttribute(el, 'content', [
+            {tag: 'div', class: 'flex-1 overflow-y-auto px-2 py-4', id: 'chat-messages', content: [
+                activeChat.transform(function (chat) {
+                    return {tag: 'p', content: chat}
+                })
+            ]}
+        ])
+        assert.equal(el.querySelector('#chat-messages p').textContent, 'Hello World')
+        activeChat.set('Goodbye World')
+        assert.equal(el.querySelector('#chat-messages p').textContent, 'Goodbye World')
+    });
+
+    test('setAttribute.setContent removes old content on state change', function () {
+        const items = new State([
+            {tag: 'li', content: 'one'},
+            {tag: 'li', content: 'two'},
+            {tag: 'li', content: 'three'}
+        ])
+        const el = document.createElement('ul')
+        document.body.append(el)
+        setAttribute(el, 'content', [items.transform(function (v) {
+            return v
+        })])
+        assert.equal(el.querySelectorAll('li').length, 3)
+        items.set([{tag: 'li', content: 'only'}])
+        assert.equal(el.querySelectorAll('li').length, 1)
+        assert.equal(el.querySelector('li').textContent, 'only')
+        items.set([])
+        assert.equal(el.querySelectorAll('li').length, 0)
+        el.remove()
+    });
+
+    test('setAttribute.setContent with State initially empty then renders content', function () {
+        const items = new State([])
+        const el = document.createElement('ul')
+        document.body.append(el)
+        setAttribute(el, 'content', [items.transform(function (v) {
+            return v
+        })])
+        assert.equal(el.querySelectorAll('li').length, 0)
+        items.set([{tag: 'li', content: 'first'}, {tag: 'li', content: 'second'}])
+        assert.equal(el.querySelectorAll('li').length, 2)
+        assert.equal(el.querySelector('li').textContent, 'first')
+        el.remove()
+    });
+
     test('setAttribute.setContent in array', function () {
         const content = new State('world')
         const el = document.createElement('div')

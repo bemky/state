@@ -30,16 +30,24 @@ function addListenerAndObserve (state, el, callback) {
 const fromObjectWas = toNodes.fromObject
 toNodes.fromObject = function (obj, ...args) {
     if (State.isState(obj)) {
-        const entry = addListenerAndObserve(obj, toNodes(obj.value), function (v) {
+        function toContent (v) {
+            // always prepend empty text node as a placeholder in cast toNodes is empty
+            return [
+                document.createTextNode(""),
+                ...toNodes(v)
+            ]
+        }
+        const placeholder = document.createTextNode("")
+        const entry = addListenerAndObserve(obj, toContent(obj.value), function (v) {
             const anchor = entry.els.find(x => x.parentNode)
-            const newContent = toNodes(v)
+            const newContent = toContent(v)
             if (anchor) {
                 anchor.replaceWith(...newContent)
                 remove(entry.els);
             } else {
-                entry.els.splice(0, entry.els.length, ...newContent)
+                if(entry.els.length > 0) { debugger }
             }
-            entry.els = newContent
+            entry.els.splice(0, entry.els.length, ...newContent)
         })
         return entry.els
     } else {
