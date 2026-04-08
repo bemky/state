@@ -34,7 +34,7 @@
   },
   "peerDependency": {
     "viking": "github:malomalo/viking",
-    "dolla": "^1.6.0",
+    "dolla": "^1.6.0"
   },
   "peerDependenciesMeta": {
     "optional": true
