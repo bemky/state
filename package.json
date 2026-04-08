@@ -28,8 +28,15 @@
   },
   "homepage": "https://github.com/bemky/state#readme",
   "devDependencies": {
+    "viking": "github:malomalo/viking",
     "dolla": "^1.6.0",
-    "happy-dom": "^18.0.1",
-    "viking": "github:malomalo/viking"
-  }
+    "happy-dom": "^18.0.1"
+  },
+  "peerDependency": {
+    "viking": "github:malomalo/viking",
+    "dolla": "^1.6.0",
+  },
+  "peerDependenciesMeta": {
+    "optional": true
+  } 
 }
