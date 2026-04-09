@@ -30,26 +30,24 @@ function addListenerAndObserve (state, el, callback) {
 const fromObjectWas = toNodes.fromObject
 toNodes.fromObject = function (obj, ...args) {
     if (State.isState(obj)) {
-        function toContent (v) {
-            // use comment nodes as bookend nodes for swapping new and old content
-            return [
-                document.createComment('state-start'),
-                ...toNodes(v),
-                document.createComment('state-end')
-            ]
-        }
-        const entry = addListenerAndObserve(obj, toContent(obj.value), function (v) {
-            const newContent = toContent(v)
-            if (entry.els.at(0).parentNode) {
-                const range = document.createRange()
-                range.setStartAfter(entry.els.at(0))
-                range.setEndBefore(entry.els.at(-1))
-                range.deleteContents()
-                entry.els.at(-1).before(...newContent.slice(1, -1))
-            }
-            entry.els.splice(0, entry.els.length, ...newContent)
+        const start = document.createComment('state-start')
+        const end = document.createComment('state-end')
+
+        const content = toNodes(obj.value)
+        const entry = addListenerAndObserve(obj, content, v => {
+            entry.els = toNodes(v)
+            const range = document.createRange()
+            range.setStartAfter(start)
+            range.setEndBefore(end)
+            range.deleteContents()
+            end.before(...entry.els)
         })
-        return entry.els
+        
+        return  [
+            start,
+            content,
+            end
+        ].flat()
     } else {
         return fromObjectWas.call(this, obj, ...args)
     }
