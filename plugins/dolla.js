@@ -35,6 +35,10 @@ toNodes.fromObject = function (obj, ...args) {
 
         const content = toNodes(obj.value)
         const entry = addListenerAndObserve(obj, content, v => {
+            // Bookends may be unparented if the listener fires before they
+            // are attached (e.g., a custom element's connectedCallback
+            // mutates state mid-render) or after they have been removed.
+            if (!start.parentNode || !end.parentNode) return
             entry.els = toNodes(v)
             const range = document.createRange()
             range.setStartAfter(start)

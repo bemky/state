@@ -65,6 +65,47 @@ suite('dolla', () => {
         el.remove()
     });
 
+    test('setAttribute.setContent does not throw when state changes while a bookend comment is unparented', function () {
+        // Reproduces the Firefox-reported bug: during a custom element's
+        // connectedCallback, the bookend `end` comment can still be
+        // unparented (only `start` has been appended) when a synchronous
+        // state mutation fires the listener. Real browsers throw
+        // "The supplied node is incorrect or has an incorrect ancestor
+        // for this operation." on Range.setEndBefore in that state.
+        // happy-dom is lenient about Range on unparented nodes, so patch
+        // createRange here to mirror the spec.
+        const createRangeWas = document.createRange.bind(document)
+        document.createRange = function () {
+            const range = createRangeWas()
+            const setStartAfterWas = range.setStartAfter.bind(range)
+            const setEndBeforeWas = range.setEndBefore.bind(range)
+            const guard = (node) => {
+                if (!node.parentNode) throw new DOMException(
+                    'The supplied node is incorrect or has an incorrect ancestor for this operation.',
+                    'InvalidNodeTypeError'
+                )
+            }
+            range.setStartAfter = function (node) { guard(node); return setStartAfterWas(node) }
+            range.setEndBefore = function (node) { guard(node); return setEndBeforeWas(node) }
+            return range
+        }
+        try {
+            const content = new State('one')
+            const el = document.createElement('div')
+            document.body.append(el)
+            setAttribute(el, 'content', [content.transform(v => v)])
+            // Simulate the mid-render state: only `start` is attached.
+            const end = Array.from(el.childNodes).find(n => n.nodeType === 8 && n.data === 'state-end')
+            end.remove()
+            assert.doesNotThrow(() => {
+                content.set('two')
+            })
+            el.remove()
+        } finally {
+            document.createRange = createRangeWas
+        }
+    });
+
     test('setAttribute.setContent with State initially empty then renders content', function () {
         const items = new State([])
         const el = document.createElement('ul')
