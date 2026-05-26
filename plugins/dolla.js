@@ -11,7 +11,7 @@ State.cleanupReferences = function () {
     })
 }
 State.cleanupDelay = 5000
-State.cleanupInterval = setInterval(() => State.cleanupReferences, State.cleanupDelay)
+State.cleanupInterval = setInterval(State.cleanupReferences, State.cleanupDelay)
 State.disconnect = function () {
     clearInterval(State.cleanupInterval)
 }
