@@ -1,7 +1,7 @@
 import test, { suite, after } from 'node:test';
 import assert from 'node:assert';
 import State from '../state.js';
-import { setAttribute } from 'dolla';
+import { setAttribute, toNodes, createElement } from 'dolla';
 import '../plugins/dolla.js';
 
 suite('dolla', () => {
@@ -120,6 +120,15 @@ suite('dolla', () => {
         el.remove()
     });
 
+    test('setAttribute.setContent updates while detached then renders on attach', function () {
+        const content = new State('first')
+        const els = toNodes(content.transform(v => createElement({tag: 'p', content: v})))
+        content.set('second')
+        const el = document.createElement('div')
+        el.append(...els)
+        assert.equal(el.querySelector('p').textContent, 'second')
+    });
+
     test('setAttribute.setContent in array', function () {
         const content = new State('world')
         const el = document.createElement('div')
@@ -127,11 +136,11 @@ suite('dolla', () => {
             {tag: 'strong', content: 'hello'},
             content
         ])
-        assert.equal('<div><strong>hello</strong>world</div>', el.outerHTML)
+        assert.equal('<div><strong>hello</strong><!--state-start-->world<!--state-end--></div>', el.outerHTML)
         content.set('world!')
-        assert.equal('<div><strong>hello</strong>world!</div>', el.outerHTML)
+        assert.equal('<div><strong>hello</strong><!--state-start-->world!<!--state-end--></div>', el.outerHTML)
         content.set('<span>world</span>')
-        assert.equal('<div><strong>hello</strong><span>world</span></div>', el.outerHTML)
+        assert.equal('<div><strong>hello</strong><!--state-start--><span>world</span><!--state-end--></div>', el.outerHTML)
     });
 
 

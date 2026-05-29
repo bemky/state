@@ -16,13 +16,9 @@ State.disconnect = function () {
     clearInterval(State.cleanupInterval)
 }
 
-function addListenerAndObserve (state, el, callback) {
+function addListenerAndObserve (state, callback, ...els) {
     state.addListener(callback)
-    const entry = {
-        els: Array.isArray(el) ? el : [el],
-        callback,
-        state
-    }
+    const entry = { els, callback, state }
     State.listeningReferences.add(entry)
     return entry
 }
@@ -33,25 +29,21 @@ toNodes.fromObject = function (obj, ...args) {
         const start = document.createComment('state-start')
         const end = document.createComment('state-end')
 
-        const content = toNodes(obj.value)
-        const entry = addListenerAndObserve(obj, content, v => {
-            // Bookends may be unparented if the listener fires before they
-            // are attached (e.g., a custom element's connectedCallback
-            // mutates state mid-render) or after they have been removed.
+        const entry = addListenerAndObserve(obj, () => {
+            const content = toNodes(obj.value)
+            entry.els.splice(1, entry.els.length - 2, ...content)
+            
             if (!start.parentNode || !end.parentNode) return
-            entry.els = toNodes(v)
             const range = document.createRange()
             range.setStartAfter(start)
             range.setEndBefore(end)
             range.deleteContents()
-            end.before(...entry.els)
-        })
+            end.before(...content)
+        }, start, end)
         
-        return  [
-            start,
-            content,
-            end
-        ].flat()
+        entry.callback()
+        
+        return entry.els
     } else {
         return fromObjectWas.call(this, obj, ...args)
     }
@@ -60,7 +52,7 @@ toNodes.fromObject = function (obj, ...args) {
 const setWas = setAttribute.set
 setAttribute.set = function (el, key, value, ...args) {
     if (State.isState(value)) {
-        addListenerAndObserve(value, el, v => setWas.call(this, el, key, v, ...args))
+        addListenerAndObserve(value, v => setWas.call(this, el, key, v, ...args), el)
         setWas.call(this, el, key, value.value, ...args)
     } else {
         setWas.call(this, el, key, value, ...args)
@@ -71,7 +63,7 @@ setAttribute.set = function (el, key, value, ...args) {
 const styleSetWas = setAttribute.setStyle
 setAttribute.setStyle = function (el, key, value, ...args) {
     if (State.isState(value)) {
-        addListenerAndObserve(value, el, v => styleSetWas.call(this, el, key, v, ...args))
+        addListenerAndObserve(value, v => styleSetWas.call(this, el, key, v, ...args), el)
         styleSetWas.call(this, el, key, value.value, ...args)
     } else {
         styleSetWas.call(this, el, key, value, ...args)
@@ -82,7 +74,7 @@ setAttribute.setStyle = function (el, key, value, ...args) {
 const addClassWas = setAttribute.addClass
 setAttribute.addClass = function (el, token) {
     if (State.isState(token)) {
-        addListenerAndObserve(token, el, (now, was) => {
+        addListenerAndObserve(token, (now, was) => {
             now = now.split(" ")
             was = was.split(" ")
             if (now.length == 1 && was.length == 1) {
@@ -91,7 +83,7 @@ setAttribute.addClass = function (el, token) {
                 el.classList.remove(...was)
                 el.classList.add(...now)
             }
-        })
+        }, el)
         addClassWas.call(this, el, token.value)
     } else {
         addClassWas.call(this, el, token)
@@ -102,7 +94,7 @@ setAttribute.addClass = function (el, token) {
 const setDataWas = setAttribute.setData
 setAttribute.setData = function (el, key, value, ...args) {
     if (State.isState(value)) {
-        addListenerAndObserve(value, el, v => setDataWas.call(this, el, key, v, ...args))
+        addListenerAndObserve(value, v => setDataWas.call(this, el, key, v, ...args), el)
         setDataWas.call(this, el, key, value.value, ...args)
     } else {
         setDataWas.call(this, el, key, value, ...args)
