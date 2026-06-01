@@ -4,16 +4,26 @@
 export default class State {
     #value = null;
     listens = new Set
-    
+
     /**
         Denotes this object is a State, helpful for telling objects apart
-        @property {boolean} isState - 
+        @property {boolean} isState -
     */
     isState = true
-    
+
     static isState (obj) {
         return obj instanceof this
     }
+
+    /**
+        When a `transform` spawn is garbage-collected, drop the now-dead
+        listener it left on its source State. The source holds the spawn only
+        through a WeakRef (see `transform`), so the spawn stays collectable; this
+        registry prunes the leftover listener once that collection happens.
+    */
+    static transformRegistry = new FinalizationRegistry(({ source, callback }) => {
+        source.removeListener(callback)
+    })
     
     constructor(v) {
         this.#value = v
@@ -114,7 +124,24 @@ export default class State {
     */
     transform (transformation) {
         const spawn = new State(transformation(this.#value))
-        this.addListener((...args) => spawn.set(transformation(...args)))
+        const source = this
+        // The source must hold the spawn WEAKLY. A strong reference here would
+        // pin every spawn for the source's entire lifetime — and sources are
+        // often long-lived (e.g. a memoized `record.state(attr)`), so each
+        // render would leak another spawn + listener. Instead the listener
+        // dereferences a WeakRef; once the spawn is collected the listener is
+        // a no-op and `transformRegistry` removes it from the source.
+        const spawnRef = new WeakRef(spawn)
+        const callback = (...args) => {
+            const target = spawnRef.deref()
+            if (target === undefined) {
+                source.removeListener(callback)
+            } else {
+                target.set(transformation(...args))
+            }
+        }
+        this.addListener(callback)
+        State.transformRegistry.register(spawn, { source, callback })
         return spawn
     }
 }

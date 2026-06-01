@@ -279,4 +279,37 @@ suite('dolla', () => {
         State.cleanupReferences()
         assert.equal(content.listens.size, 0)
     });
+
+    test('cleanup preserves a transform spawn when referenced', function () {
+        const source = new State('active')
+        const sourceToggle = source.transform(v => v === 'active' ? 'on' : 'off')
+        const el = createElement({content: sourceToggle})
+        source.set('inactive')
+        assert.equal(el.innerHTML, 'off')
+        el.remove()
+        State.cleanupReferences()
+        source.set('active')
+        const el2 = createElement({content: sourceToggle})
+        assert.equal(el2.innerHTML, 'on')
+    });
+
+    test('an unreferenced transform spawn is pruned from its source after GC', {
+        skip: typeof global.gc !== 'function' ? 'run with --expose-gc' : false
+    }, async function () {
+        const source = new State('active')
+        let spawn = source.transform(v => v === 'active' ? 'on' : 'off')
+        // bind + unbind it so dolla isn't holding it via listeningReferences
+        const el = document.createElement('div')
+        document.body.append(el)
+        setAttribute(el, 'class', spawn)
+        el.remove()
+        State.cleanupReferences()
+        assert.equal(source.listens.size, 1) // still subscribed — not eagerly severed
+        spawn = null                          // drop the only strong reference
+        for (let i = 0; i < 10 && source.listens.size > 0; i++) {
+            global.gc()
+            await new Promise(r => setTimeout(r, 10))
+        }
+        assert.equal(source.listens.size, 0) // FinalizationRegistry pruned the dead listener
+    });
 })
