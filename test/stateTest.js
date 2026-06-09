@@ -46,6 +46,16 @@ test('transform', function() {
     assert.equal(isOpenClass, '-hide')
 })
 
+test('transform updates through chained transforms', function() {
+    const count = new State(1)
+    const doubled = count.transform(v => v * 2)
+    const label = doubled.transform(v => `=${v}`)
+    assert.equal(label.value, '=2')
+    count.set(5)
+    assert.equal(doubled.value, 10)
+    assert.equal(label.value, '=10')
+})
+
 test('static isState', function() {
     const isOpen = new State(true)
     const foo = 1

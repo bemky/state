@@ -8,8 +8,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node --import ./test/loader.js --test **/*Test.js",
-    "test:only": "node --import ./test/loader.js --test-only --test **/*Test.js"
+    "test": "NODE_OPTIONS=--expose-gc node --import ./test/loader.js --test **/*Test.js",
+    "test:only": "NODE_OPTIONS=--expose-gc node --import ./test/loader.js --test-only --test **/*Test.js"
   },
   "repository": {
     "type": "git",
