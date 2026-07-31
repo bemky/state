@@ -4,10 +4,15 @@ import { Record } from 'viking';
 Record.prototype.state = function (attribute) {
     if (!this.states) this.states = {};
     if (!this.states[attribute]) {
-        if (this.association(attribute)) {
-            this.states[attribute] = new State(this.association(attribute).target);
-            this.association(attribute).addEventListener(['afterAdd', 'afterRemove'], (changed) => {
-                this.states[attribute].set(this.association(attribute).target);
+        const association = this.association(attribute);
+        if (association) {
+            // Collection associations mutate `target` in place, so passing it straight
+            // through leaves State comparing an array against itself and no listener
+            // ever fires. Snapshot those; belongsTo hands over the record as-is.
+            const read = () => Array.isArray(association.target) ? [...association.target] : association.target;
+            this.states[attribute] = new State(read());
+            association.addEventListener(['afterAdd', 'afterRemove'], () => {
+                this.states[attribute].set(read());
             });
         } else {
             this.states[attribute] = new State(this[attribute]);
