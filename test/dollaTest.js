@@ -173,7 +173,16 @@ suite('dolla', () => {
         klass.set('bg-black hello-world')
         assert.equal("border-blue bg-black hello-world", el.className)
     });
-    
+
+    test('setAttribute.setClass with array containing State that becomes empty', function () {
+        const klass = new State('bg-white')
+        const el = document.createElement('div')
+        setAttribute(el, 'class', ['border-blue', klass])
+        assert.equal("border-blue bg-white", el.className)
+        klass.set('')
+        assert.equal("border-blue", el.className)
+    });
+
     test('setAttribute.setData', function () {
         const data = new State({name: 'Rod', job: 'Stunt Man'})
         const el = document.createElement('div')
