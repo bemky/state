@@ -1,5 +1,16 @@
 import State from '../state.js';
-import { Record } from 'viking';
+import { Model, Record } from 'viking';
+
+Model.prototype.state = function (attribute) {
+    if (!this.states) this.states = {};
+    if (!this.states[attribute]) {
+        this.states[attribute] = new State(this[attribute]);
+        this.addEventListener('changed:' + attribute, (record, was, now) => {
+            this.states[attribute].set(now);
+        });
+    }
+    return this.states[attribute];
+}
 
 Record.prototype.state = function (attribute) {
     if (!this.states) this.states = {};
@@ -10,10 +21,7 @@ Record.prototype.state = function (attribute) {
                 this.states[attribute].set(this.association(attribute).target);
             });
         } else {
-            this.states[attribute] = new State(this[attribute]);
-            this.addEventListener('changed:' + attribute, (record, was, now) => {
-                this.states[attribute].set(now);
-            });
+            return Model.prototype.state.call(this, attribute);
         }
     }
     return this.states[attribute];
