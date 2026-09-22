@@ -1,13 +1,19 @@
 import test, { suite } from 'node:test';
 import assert from 'node:assert';
 import State from '../state.js';
-import { Record } from 'viking';
+import { Model, Record } from 'viking';
 import { belongsTo } from 'viking/record/associations';
 import '../plugins/viking.js';
 
 class Ship extends Record {
     static schema = {
         id: { type: 'integer' },
+        name: { type: 'string' }
+    };
+}
+
+class Widget extends Model {
+    static schema = {
         name: { type: 'string' }
     };
 }
@@ -63,5 +69,19 @@ suite('viking', () => {
         assert.equal(shipState.value, ship1);
         captain.ship = ship2;
         assert.equal(shipState.value, ship2);
+    });
+
+    test('state returns a State for an attribute on a plain Model', function () {
+        const widget = new Widget({ name: 'Gizmo' });
+        const nameState = widget.state('name');
+        assert(nameState instanceof State);
+        assert.equal(nameState.value, 'Gizmo');
+    });
+
+    test('state updates when a Model attribute changes', function () {
+        const widget = new Widget({ name: 'Gizmo' });
+        const nameState = widget.state('name');
+        widget.name = 'Gadget';
+        assert.equal(nameState.value, 'Gadget');
     });
 });
